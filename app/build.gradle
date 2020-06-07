@@ -1,0 +1,100 @@
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
+
+def versionSuffix = "-" + getDateTimeVersion()
+def versionMajor = 1
+def versionMinor = 0
+def versionPatch = 0
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.2"
+
+    defaultConfig {
+        applicationId "br.com.baseapplication"
+        testApplicationId "br.com.fiserv.test"
+        minSdkVersion 19
+        targetSdkVersion 29
+        versionCode versionMajor * 1000000 + versionMinor * 1000 + versionPatch
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ".dev"
+            versionNameSuffix "${versionSuffix}"
+            testCoverageEnabled true
+            debuggable true
+        }
+        mock {
+            applicationIdSuffix ".mock"
+            versionNameSuffix "${versionSuffix}"
+            testCoverageEnabled true
+            debuggable true
+        }
+        homolog {
+            applicationIdSuffix '.hml'
+            versionNameSuffix "${versionSuffix}"
+            debuggable true
+            testCoverageEnabled true
+        }
+        release {
+            minifyEnabled true
+            versionNameSuffix "${versionSuffix}"
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+
+    testOptions {
+        animationsDisabled true
+    }
+
+    androidExtensions {
+        experimental true
+    }
+
+    dataBinding {
+        enabled true
+    }
+}
+
+dependencies {
+    implementation project(':data')
+    implementation project(':domain')
+    implementation project(':entity')
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "androidx.core:core-ktx:$core_ktx_version"
+    implementation "androidx.appcompat:appcompat:$appcompat_version"
+    implementation "androidx.constraintlayout:constraintlayout:$constraint_layout_version"
+    implementation "androidx.recyclerview:recyclerview:$recycler_view_version"
+    implementation "org.koin:koin-androidx-viewmodel:$koin_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_livedata_version"
+    implementation "com.facebook.stetho:stetho:$stetho_version"
+
+    testImplementation "junit:junit:$junit_version"
+
+    androidTestImplementation "androidx.test.ext:junit:$androidx_junit_version"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
+}
+
+static def getDateTimeVersion() {
+    DateFormat df = new SimpleDateFormat("yyMMdd.HHmm")
+    return df.format(new Date())
+}
